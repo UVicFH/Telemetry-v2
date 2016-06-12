@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/UVicFH/Telemetry-v2#readme",
   "dependencies": {
-    "bootstrap": "^3.3.6"
+    "bootstrap": " 3.3.6",
+    "express": " 4.13.4"
   }
 }
