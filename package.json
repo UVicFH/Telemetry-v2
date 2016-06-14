@@ -26,6 +26,7 @@
   "homepage": "https://github.com/UVicFH/Telemetry-v2#readme",
   "dependencies": {
     "bootstrap": " 3.3.6",
-    "express": " 4.13.4"
+    "express": " 4.13.4",
+    "serialport": "^3.1.2"
   }
 }
