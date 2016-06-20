@@ -1,17 +1,20 @@
 // Constants
 var PATH = '/../public/';
 var PORT = 3000;
-var SERIALPORT = "/dev/tty.SLAB_USBtoUART";
+var SERIALPORT = '/dev/tty.SLAB_USBtoUART';
+
+// Import CAN message handling
+var processCanMessage = require('./processCanMessage');
 
 // Create Express server
 var express = require('express');
 var app = express();
 
 // Grab bootstrap middleware (serves css/js into accessible locaiton for frontend)
-var bootstrap = require("express-bootstrap-service");
+var bootstrap = require('express-bootstrap-service');
 
 // Open serial port to Dorito (telemetry) chip
-var SerialPort = require("serialport").SerialPort;
+var SerialPort = require('serialport').SerialPort;
 var serialPort = new SerialPort(SERIALPORT, {
     baudrate: 115200
 });
