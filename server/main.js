@@ -60,11 +60,13 @@ const webpack = require('webpack')
 const webpackConfig = require('../webpack.config.js')
 const webpackMiddleware = require('webpack-dev-middleware')
 const webpackHotMiddleware = require('webpack-hot-middleware')
+
 const compiler = webpack(webpackConfig)
 const middleware = webpackMiddleware(compiler, {
 	publicPath: webpackConfig.output.publicPath
 })
 
+// Use webpack to serve files (todo: have alternate solution when I set up production builds)
 app.use(middleware)
 app.use(webpackHotMiddleware(compiler))
 
@@ -72,8 +74,6 @@ app.use(webpackHotMiddleware(compiler))
  *  #       ROUTING       #
  *  #######################
  */
-// Server static files at PATH
-app.use('/', express.static(__dirname + PATH_CLIENT))
 // Get data
 app.get('/data', function(req, res, err) {
 	if (err) { console.log('data get error') }
