@@ -11,10 +11,10 @@ export default class UVicHybridTelemetry extends Component {
 			<div className="container">
 				<div className="row">
 					<div className="col-md-4">
-						<Panel />
+						<Panel head="Dash"/>
 					</div>
 					<div className="col-md-8">
-						<Panel />
+						<Panel head="Graphs"/>
 					</div>
 				</div>
 			</div>
