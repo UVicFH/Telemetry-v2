@@ -8,7 +8,7 @@ const PORT = 3000
 const SERIALPORT = '/dev/tty.SLAB_USBtoUART'
 
 // Import CAN message handling
-const processCanMessage = require('./processCanMessage')
+import processCanMessage from './processCanMessage'
 
 // Create Express server
 const express = require('express'),
@@ -20,7 +20,7 @@ const express = require('express'),
  */
 // Create DB
 const Datastore = require('nedb'),
-	db = new Datastore({ filename: 'dataStore', autoload: true })
+	db = new Datastore({ filename: './dataStore', autoload: true })
 
 /*  #######################
  *  #     SERIALPORT      #
@@ -28,7 +28,7 @@ const Datastore = require('nedb'),
  */
 // Open serial port to Dorito (telemetry) chip
 const SerialPort = require('serialport').SerialPort,
-	serialPort = new SerialPort(SERIALPORT, {       //change back to SERIALPORT when chip is plugged in
+	serialPort = new SerialPort(SERIALPORT, {
 		baudrate: 115200
 	})
 
@@ -39,7 +39,12 @@ serialPort.on('open', function() {
 
 // On serial port receive data, process/save it
 serialPort.on('data', function (data) {
-	db.insert(processCanMessage(data), function (err) { console.log('db insert error') })
+	db.insert(processCanMessage(data),
+		function (err, newDoc) {
+			if (err) console.log(`db insert error: ${err}`)
+			console.log(newDoc)
+		}
+	)
 })
 
 /*  #######################
@@ -66,7 +71,7 @@ const middleware = webpackMiddleware(compiler, {
 	publicPath: webpackConfig.output.publicPath
 })
 
-// Use webpack to serve files (todo: have alternate solution when I set up production builds)
+// Use webpack to build files in memory (to be served) todo: have alternate solution when I set up production builds
 app.use(middleware)
 app.use(webpackHotMiddleware(compiler))
 
@@ -76,10 +81,13 @@ app.use(webpackHotMiddleware(compiler))
  */
 // Get data
 app.get('/data', function(req, res, err) {
-	if (err) { console.log('data get error') }
-	res.send(db.find({}, function (err) { console.log('db get error') }))
+	if (err) console.log(`data get error: ${err}`)
+	res.send(
+		db.find({},
+			function (err) {
+				if (err) console.log(`db get error: ${err}`) }))
 })
 // Server listens to requests on PORT
 app.listen(PORT, function reportRunning() {
-	console.log('Running on port ' + PORT)
+	console.log(`Running on port ${PORT}`)
 })
