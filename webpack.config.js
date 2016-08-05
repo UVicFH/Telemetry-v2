@@ -46,5 +46,8 @@ module.exports = {
 				loaders: ['style', 'css']
 			}
 		]
+	},
+	resolve: {
+		extensions: ['', '.js', '.jsx'],
 	}
 }
