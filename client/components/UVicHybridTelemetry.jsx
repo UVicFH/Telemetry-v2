@@ -1,9 +1,15 @@
 import React, {Component} from 'react'
 import Panel from './Panel'
+import io from 'socket.io-client'
+var socket = io()
 
 export default class UVicHybridTelemetry extends Component {
 	constructor (props) {
 		super(props)
+
+		socket.on('data', (msg) => {
+			console.log(msg)
+		})
 	}
 
 	render () {

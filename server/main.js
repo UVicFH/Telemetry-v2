@@ -13,6 +13,13 @@ import processCanMessage from './processCanMessage'
 // Create Express server
 const express = require('express'),
 	app = express()
+const server = require('http').Server(app)      //reason for http server: http://stackoverflow.com/questions/17696801/express-js-app-listen-vs-server-listen
+
+/*  #######################
+ *  #      SOCKET.IO      #
+ *  #######################
+ */
+const io = require('socket.io')(server)
 
 /*  #######################
  *  #      DATABASE       #
@@ -43,6 +50,7 @@ serialPort.on('data', function (data) {
 		function (err, newDoc) {
 			if (err) console.log(`db insert error: ${err}`)
 			console.log(newDoc)
+			io.emit('data', newDoc)
 		}
 	)
 })
@@ -79,6 +87,17 @@ app.use(webpackHotMiddleware(compiler))
  *  #       ROUTING       #
  *  #######################
  */
+
+// On webso
+io.on('connection', (socket) => {
+	console.log('websocket connected')
+
+	socket.emit('data', { test: 'testData' })
+
+	socket.on('disconnect', () => {
+		console.log('websocket disconnected')
+	})
+})
 // Get data
 app.get('/data', function(req, res, err) {
 	if (err) console.log(`data get error: ${err}`)
@@ -88,6 +107,6 @@ app.get('/data', function(req, res, err) {
 				if (err) console.log(`db get error: ${err}`) }))
 })
 // Server listens to requests on PORT
-app.listen(PORT, function reportRunning() {
+server.listen(PORT, function reportRunning() {
 	console.log(`Running on port ${PORT}`)
 })
