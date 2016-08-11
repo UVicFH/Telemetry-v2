@@ -23,9 +23,9 @@ export default class Frame extends Component {
 	}
 }
 
-Frame.propTypes = {
+Panel.propTypes = {
 	header: PropTypes.string.isRequired
 }
-Frame.defaultProps = {
+Panel.defaultProps = {
 	header: '...'
 }
