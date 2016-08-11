@@ -1,18 +1,18 @@
 import React, {Component, PropTypes} from 'react'
 
-export default class Panel extends Component {
+export default class Frame extends Component {
 	constructor (props) {
 		super (props)
 	}
 
 	render () {
-		const {head} = this.props
+		const {header} = this.props
 
 		return (
 			<div>
 				<div className="panel panel-default">
 					<div className="panel-heading">
-						<h2 className="panel-title">{head}</h2>
+						<h2 className="panel-title">{header}</h2>
 					</div>
 					<div className="panel-body">
 						<p>PanelContents</p>
@@ -23,8 +23,9 @@ export default class Panel extends Component {
 	}
 }
 
-Panel.propTypes = {
-	head: PropTypes.string.isRequired
+Frame.propTypes = {
+	header: PropTypes.string.isRequired
 }
-Panel.defaultProps = {
+Frame.defaultProps = {
+	header: '...'
 }
