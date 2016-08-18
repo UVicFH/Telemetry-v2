@@ -2,17 +2,16 @@
  *  #      CONSTANTS      #
  *  #######################
  */
-const PATH_CLIENT = '/../client/'
-const PORT = 3000
+import {PORT} from '../shared/constants'
 // const SERIALPORT = '/dev/ttys001'
-const SERIALPORT = '/dev/tty.SLAB_USBtoUART'
+import {SERIALPORT, MODE} from '../shared/constants'
 
 // Import CAN message handling
 import processCanMessage from './processCanMessage'
 
 // Create Express server
-const express = require('express'),
-	app = express()
+import express from 'express'
+const app = express()
 const server = require('http').Server(app)      //reason for http server: http://stackoverflow.com/questions/17696801/express-js-app-listen-vs-server-listen
 
 /*  #######################
@@ -26,53 +25,45 @@ const io = require('socket.io')(server)
  *  #######################
  */
 // Create DB
-const Datastore = require('nedb'),
-	db = new Datastore({ filename: './dataStore', autoload: true })
+import Datastore from 'nedb'
+const db = new Datastore({ filename: './dataStore', autoload: true })
 
 /*  #######################
  *  #     SERIALPORT      #
  *  #######################
  */
+import {SerialPort} from 'serialport'
 // Open serial port to Dorito (telemetry) chip
-const SerialPort = require('serialport').SerialPort,
-	serialPort = new SerialPort(SERIALPORT, {
+if (MODE !== 'dev') {
+	const serialPort = new SerialPort(SERIALPORT, {
 		baudrate: 115200
 	})
 
-// On serial port open, print success message
-serialPort.on('open', function() {
-	console.log('Serial port open')
-})
+	// On serial port open, print success message
+	serialPort.on('open', function () {
+		console.log('Serial port open')
+	})
 
-// On serial port receive data, process/save it
-serialPort.on('data', function (data) {
-	db.insert(processCanMessage(data),
-		function (err, newDoc) {
-			if (err) console.log(`db insert error: ${err}`)
-			console.log(newDoc)
-			io.emit('data', newDoc)
-		}
-	)
-})
-
-/*  #######################
- *  #      BOOTSTRAP      #
- *  #######################
- */
-// Grab bootstrap middleware (serves css/js into accessible locaiton for frontend)
-const bootstrap = require('express-bootstrap-service')
-
-// Load bootstrap middleware - mounts bootstrap css and js into accessible location for frontend
-app.use(bootstrap.serve)
+	// On serial port receive data, process/save it
+	serialPort.on('data', function (data) {
+		db.insert(processCanMessage(data),
+			function (err, newDoc) {
+				if (err) console.log(`db insert error: ${err}`)
+				console.log(newDoc)
+				io.emit('data', newDoc)
+			}
+		)
+	})
+}
 
 /*  #######################
  *  #       WEBPACK       #
  *  #######################
  */
-const webpack = require('webpack')
-const webpackConfig = require('../webpack.config.js')
-const webpackMiddleware = require('webpack-dev-middleware')
-const webpackHotMiddleware = require('webpack-hot-middleware')
+import webpack from 'webpack'
+import webpackConfig from '../webpack.config.js'
+import webpackMiddleware from 'webpack-dev-middleware'
+import webpackHotMiddleware from 'webpack-hot-middleware'
 
 const compiler = webpack(webpackConfig)
 const middleware = webpackMiddleware(compiler, {
@@ -88,7 +79,7 @@ app.use(webpackHotMiddleware(compiler))
  *  #######################
  */
 
-// On webso
+// On websocket connection
 io.on('connection', (socket) => {
 	console.log('websocket connected')
 
