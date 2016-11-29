@@ -1,4 +1,5 @@
 import React, {Component, PropTypes} from 'react'
+import Visualizations from 'Visualizations'
 
 export default class Panel extends Component {
 	constructor (props) {
@@ -6,26 +7,41 @@ export default class Panel extends Component {
 	}
 
 	render () {
-		const {header} = this.props
+		const {header, content, data} = this.props
+		const elements = []
+
+		content.forEach( (e) => {
+			const Visualization = Visualizations[e.type]
+			console.log(data)
+			const visualizationData = data.find( (d) => {
+				console.log(e.dataId)
+				console.log(d.dataId)
+				return(e.dataId === d.dataId)
+			})
+			console.log(visualizationData)
+
+			elements.push(
+				<div className={`col-md-${e.width}`} key={e.header}>
+					<Visualization header={e.header} data={visualizationData}/>
+				</div>
+			)
+		})
 
 		return (
 			<div>
-				<div className="panel panel-default">
-					<div className="panel-heading">
-						<h2 className="panel-title">{header}</h2>
-					</div>
-					<div className="panel-body">
-						<p>PanelContents</p>
-					</div>
-				</div>
+				{elements}
 			</div>
 		)
 	}
 }
 
 Panel.propTypes = {
-	header: PropTypes.string.isRequired
+	header: PropTypes.string,
+	content: PropTypes.array,
+	data: PropTypes.array
 }
 Panel.defaultProps = {
-	header: '...'
+	header: '...',
+	content: [],
+	data: []
 }
