@@ -15,7 +15,14 @@ module.exports = {
 	output: {
 		path: `${__dirname}dist/`,
 		filename: 'client/bundle.js',
-		publicPath: '/'
+		publicPath: '/',
+		options: {stats: {
+			colors: true,
+			timings: true,
+			chunks: false,
+			modules: false,
+			chunkModules: false
+		}}
 	},
 	plugins: [
 		new HtmlWebpackPlugin({
@@ -59,6 +66,10 @@ module.exports = {
 			{
 				test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
 				loaders: ['file']
+			},
+			{
+				test: /\.json$/,
+				loader: 'json'
 			}
 		]
 	},
@@ -66,7 +77,8 @@ module.exports = {
 		modulesDirectories: [
 			__dirname,
 			'client',
-			'node_modules'
+			'node_modules',
+			'client/components'
 		],
 		extensions: ['', '.js', '.jsx']
 	}
