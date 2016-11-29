@@ -1,0 +1,19 @@
+[
+  {
+    "header":"Dash",
+    "width":4,
+    "content": [
+      {
+        "header":"test",
+        "width":"6",
+        "type":"ReadOut",
+        "dataId":"",
+        "unit":""
+      }
+    ]
+  },
+  {
+    "header":"Graphs",
+    "width":8
+  }
+]
