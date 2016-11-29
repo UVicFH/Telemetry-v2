@@ -6,12 +6,12 @@ export default class ReadOut extends Component {
 	}
 
 	render() {
-    const {data, unit} = this.props
+		const {data, unit} = this.props
 
 		return (
 			<div className="well">
-        {`${data} ${unit}`}
-      </div>
+				{`${data} ${unit}`}
+			</div>
 		)
 	}
 }
