@@ -67,7 +67,15 @@ import webpackHotMiddleware from 'webpack-hot-middleware'
 
 const compiler = webpack(webpackConfig)
 const middleware = webpackMiddleware(compiler, {
-	publicPath: webpackConfig.output.publicPath
+	publicPath: webpackConfig.output.publicPath,
+	stats: {
+			colors: true,
+			hash: false,
+			timings: true,
+			chunks: false,
+			chunkModules: false,
+			modules: false
+		}
 })
 
 // Use webpack to build files in memory (to be served) todo: have alternate solution when I set up production builds
@@ -83,7 +91,12 @@ app.use(webpackHotMiddleware(compiler))
 io.on('connection', (socket) => {
 	console.log('websocket connected')
 
-	socket.emit('data', { test: 'testData' })
+	socket.emit('data', [
+		{
+			dataId: 'speed',
+			data: 12
+		}
+	])
 
 	socket.on('disconnect', () => {
 		console.log('websocket disconnected')
