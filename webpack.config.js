@@ -6,6 +6,7 @@ var HtmlWebpackPlugin = require('html-webpack-plugin')
 
 
 module.exports = {
+	devtool: 'source-map',
 	entry: [
 		'babel-polyfill',
 		'webpack-hot-middleware/client?reload=true',
