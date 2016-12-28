@@ -77,8 +77,8 @@ module.exports = {
 		modulesDirectories: [
 			__dirname,
 			'client',
-			'node_modules',
-			'client/components'
+			'client/components',
+			'node_modules'
 		],
 		extensions: ['', '.js', '.jsx']
 	}
