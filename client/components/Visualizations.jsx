@@ -1,7 +1,7 @@
-import Gauge from 'Gauge'
-import ReadOut from 'ReadOut'
+import Gauge from './Gauge'
+import ReadOut from './ReadOut'
 
-module.export = {
+export {
 	Gauge,
 	ReadOut
 }

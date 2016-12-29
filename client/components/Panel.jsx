@@ -1,5 +1,5 @@
 import React, {Component, PropTypes} from 'react'
-import Visualizations from 'Visualizations'
+import * as Visualizations from './Visualizations'
 
 export default class Panel extends Component {
 	constructor (props) {
@@ -12,19 +12,16 @@ export default class Panel extends Component {
 
 		content.forEach( (e) => {
 			const Visualization = Visualizations[e.type]
-			console.log(data)
 			const visualizationData = data.find( (d) => {
-				console.log(e.dataId)
-				console.log(d.dataId)
 				return(e.dataId === d.dataId)
 			})
-			console.log(visualizationData)
 
-			elements.push(
-				<div className={`col-md-${e.width}`} key={e.header}>
-					<Visualization header={e.header} data={visualizationData}/>
-				</div>
-			)
+			if (visualizationData)
+				elements.push(
+					<div className={`col-md-${e.width}`} key={e.header}>
+						<Visualization header={e.header} data={visualizationData.data}/>
+					</div>
+				)
 		})
 
 		return (

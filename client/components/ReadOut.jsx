@@ -8,19 +8,24 @@ export default class ReadOut extends Component {
 	render() {
 		const {data, unit} = this.props
 
+		if (data.length !== 1 || !Array.isArray(data)) {
+			console.error(`data should be an array of length 1; not:`)
+			console.log(data)
+		}
+
 		return (
 			<div className="well">
-				{`${data} ${unit}`}
+				{`${data[0]} ${unit}`}
 			</div>
 		)
 	}
 }
 
 ReadOut.propTypes = {
-	data: PropTypes.number,
+	data: PropTypes.array,
 	unit: PropTypes.string
 }
 ReadOut.defaultProps = {
-	data: -1,
+	data: [-1],
 	unit: ''
 }
