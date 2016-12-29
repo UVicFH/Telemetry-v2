@@ -7,7 +7,7 @@
         "header":"test",
         "width":"6",
         "type":"ReadOut",
-        "dataId":"",
+        "dataId":"speed",
         "unit":""
       }
     ]

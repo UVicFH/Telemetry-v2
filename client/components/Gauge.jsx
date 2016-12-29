@@ -9,6 +9,7 @@ export default class Gauge extends Component {
 	render () {
 
 		return (
+			<div>{this.props.range[0]}</div>
 		)
 	}
 }

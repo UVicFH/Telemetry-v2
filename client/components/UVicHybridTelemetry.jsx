@@ -4,8 +4,6 @@ import io from 'socket.io-client'
 
 // import plotly from 'plotly'
 
-const socket = io()
-
 export default class UVicHybridTelemetry extends Component {
 	constructor (props) {
 		super(props)

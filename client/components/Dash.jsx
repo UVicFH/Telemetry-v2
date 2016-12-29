@@ -4,14 +4,14 @@ import io from 'socket.io-client'
 
 // import plotly from 'plotly'
 
-const socket = io()
-
 export default class Dash extends Component {
 	constructor(props) {
 		super(props)
 		this.state = {
 			data: []
 		}
+
+		const socket = io()
 		socket.on('data', (msg) => {
 			console.log(msg)
 			this.setState({data: msg})
