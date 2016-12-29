@@ -4,7 +4,7 @@
   "description": "UVic Formula Hybrid's Telemtry System",
   "main": "server/server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "nodemon ./test/server/testServerMain.js --exec babel-node ",
     "start": "nodemon ./server/main --exec babel-node"
   },
   "repository": {
@@ -27,6 +27,7 @@
   "homepage": "https://github.com/UVicFH/Telemetry-v2#readme",
   "dependencies": {
     "babel-polyfill": "6.9.1",
+    "body-parser": "1.15.2",
     "bootstrap-loader": "1.2.0-beta.1",
     "bootstrap-sass": "3.3.7",
     "css-loader": "0.23.1",

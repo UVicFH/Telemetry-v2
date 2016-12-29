@@ -11,6 +11,7 @@ import {PORT, SERIALPORT, MODE} from '../shared/constants'
 
 import processCanMessage from './processCanMessage'
 import express from 'express'
+import bodyParser from 'body-parser'
 import {SerialPort} from 'serialport'
 import Datastore from 'nedb'
 
@@ -50,6 +51,7 @@ const middleware = webpackMiddleware(compiler, {
 // Use webpack to build files in memory (to be served) todo: have alternate solution when I set up production builds
 app.use(middleware)
 app.use(webpackHotMiddleware(compiler))
+app.use(bodyParser.json());
 
 /*  #######################
  *  #      DATABASE       #
@@ -96,7 +98,7 @@ io.on('connection', (socket) => {
 	socket.emit('data', [
 		{
 			dataId: 'speed',
-			data: 12
+			data: [12]
 		}
 	])
 
@@ -105,14 +107,27 @@ io.on('connection', (socket) => {
 	})
 })
 
-// Get data
-app.get('/data', function(req, res, err) {
-	if (err) console.log(`data get error: ${err}`)
+// GET data
+app.get('/data', function(req, res) {
 	res.send(
 		db.find({},
 			function (err) {
 				if (err) console.log(`db GET error: ${err}`) }))
 })
+
+// allow post requests if testing
+if (MODE === 'dev') {
+	// POST data
+	app.post('/data', function(req, res) {
+		console.log(req.body)
+		db.insert(req.body, function (err, newDoc) {
+			if (err) console.log(`db insert error: ${err}`)
+			console.log(newDoc)
+			io.emit('data', newDoc)
+			res.send(newDoc)
+		})
+	})
+}
 
 // Server listens to requests on PORT
 server.listen(PORT, function reportRunning() {
