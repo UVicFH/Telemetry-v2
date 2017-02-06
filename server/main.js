@@ -51,14 +51,14 @@ const middleware = webpackMiddleware(compiler, {
 // Use webpack to build files in memory (to be served) todo: have alternate solution when I set up production builds
 app.use(middleware)
 app.use(webpackHotMiddleware(compiler))
-app.use(bodyParser.json());
+app.use(bodyParser.json())
 
 /*  #######################
  *  #      DATABASE       #
  *  #######################
  */
 // Create DB
-const db = new Datastore({ filename: './dataStore', autoload: true })
+const db = new Datastore({ filename: './dataStore.db', autoload: true })
 
 /*  #######################
  *  #     SERIALPORT      #
