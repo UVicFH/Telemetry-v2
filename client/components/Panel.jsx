@@ -16,10 +16,9 @@ export default class Panel extends Component {
 				return(e.dataId === d.dataId)
 			})
 
-			if (visualizationData)
 				elements.push(
 					<div className={`col-md-${e.width}`} key={e.header}>
-						<Visualization header={e.header} data={visualizationData.data}/>
+						<Visualization {...e} data={visualizationData ? visualizationData.data : undefined}/>
 					</div>
 				)
 		})

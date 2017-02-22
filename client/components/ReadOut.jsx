@@ -15,7 +15,7 @@ export default class ReadOut extends Component {
 
 		return (
 			<div className="well">
-				{`${data[0]} ${unit}`}
+				<p className="h4">{`${data[0]} ${unit}`}</p>
 			</div>
 		)
 	}
