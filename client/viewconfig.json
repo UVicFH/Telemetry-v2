@@ -8,12 +8,35 @@
         "width":"6",
         "type":"ReadOut",
         "dataId":"speed",
-        "unit":""
+        "unit":"gigawatts"
+      },
+      {
+        "header":"horse",
+        "width":"6",
+        "type":"ReadOut",
+        "dataId":"horse",
+        "unit":"horses"
+      },
+      {
+        "header":"speed",
+        "width":"6",
+        "type":"Guage",
+        "dataId":"speed",
+        "unit":"kmph"
       }
     ]
   },
   {
     "header":"Graphs",
-    "width":8
+    "width":8,
+    "content": [
+      {
+        "header":"horse",
+        "width":"12",
+        "type":"ReadOut",
+        "dataId":"horse",
+        "unit":"horses"
+      }
+    ]
   }
 ]
