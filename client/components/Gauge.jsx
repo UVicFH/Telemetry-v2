@@ -24,6 +24,33 @@ export default class Gauge extends Component {
 		this.needleTextSize = 8
 	}
 
+	// Helper Functions
+	getMajorGradAngles = () => {
+		
+	}
+
+	getMajorGradValues = () => {
+
+	}
+
+	// Construction Functions
+	buildMinorGrads = () => {
+		return (undefined)
+	}
+
+	buildMajorGrads = () => {
+		return (undefined)
+	}
+
+	componentDidUpdate = () => {
+		return (undefined)
+	}
+
+	componentWillUnmount = () => {
+		// destroy node
+		return (undefined)
+	}
+
 	render () {
 
 		return (
