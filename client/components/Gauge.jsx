@@ -26,11 +26,25 @@ export default class Gauge extends Component {
 
 	// Helper Functions
 	getMajorGradAngles = () => {
-		
+		const angleRange = 240
+		const minAngle = -120
+		const majorGradAngles = []
+		for (let i = 0; i <= this.majorGrads; i++)
+			majorGradAngles.push(
+				minAngle+(i*angleRange)/this.majorGrads
+			)
+		return majorGradAngles
 	}
 
 	getMajorGradValues = () => {
-
+		const {range} = this.props
+		const valueRange = range[1]-range[0]
+		const majorGradValues = []
+		for (let i = 0; i <= this.majorGrads; i++)
+			majorGradValues.push(
+				range[0]+(i*valueRange)/this.majorGrads.toFixed(0)
+			)
+		return majorGradValues
 	}
 
 	// Construction Functions
