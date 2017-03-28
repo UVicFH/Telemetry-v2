@@ -20,7 +20,7 @@
       {
         "header":"speed",
         "width":"6",
-        "type":"Guage",
+        "type":"Gauge",
         "dataId":"speed",
         "unit":"kmph"
       }
