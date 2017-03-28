@@ -15,12 +15,12 @@ export default class Panel extends Component {
 			const visualizationData = data.find( (d) => {
 				return(e.dataId === d.dataId)
 			})
-
-				elements.push(
-					<div className={`col-md-${e.width}`} key={e.header}>
-						<Visualization {...e} data={visualizationData ? visualizationData.data : undefined}/>
-					</div>
-				)
+			elements.push(
+				<div className={`col-md-${e.width}`} key={e.header}>
+					{/* FixMe: Determine what element props to pass through*/}
+					<Visualization unit={e.unit} data={visualizationData ? visualizationData.data : undefined}/>
+				</div>
+			)
 		})
 
 		return (
