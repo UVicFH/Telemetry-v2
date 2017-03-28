@@ -10,7 +10,7 @@ export default class Gauge extends Component {
 		// ToDo: scale according to width (use % instead of x/300)
 		this.innerRadius = Math.round(width*130/300)
 		this.outterRadius = Math.round(width*145/300)
-		this.majorGrads = majorGrads-1
+		this.majorGrads = majorGrads
 		this.minorGrads = minorGrads
 		this.majorGradLength = Math.round(width*16/300)
 		this.minorGradLength = Math.round(width*10/300)
@@ -25,6 +25,10 @@ export default class Gauge extends Component {
 	}
 
 	componentDidMount() {
+		this.ctx = this.node.getContext('2d')
+		this.ctx.translate(this.node.width/2, this.node.width/2)
+
+		this.buildMajorGrads()
 		this.buildMinorGrads()
 	}
 
@@ -33,11 +37,25 @@ export default class Gauge extends Component {
 		const angleRange = Math.PI*4/3
 		const minAngle = -Math.PI*2/3
 		const majorGradAngles = []
-		for (let i = 0; i <= this.majorGrads; i++){
+		for (let i = 0; i < this.majorGrads; i++) {
 			majorGradAngles.push(
-				minAngle+(i*angleRange)/this.majorGrads
-			)}
+				minAngle+(i*angleRange)/(this.majorGrads-1)
+			)
+		}
 		return majorGradAngles
+	}
+
+	getMinorGradAngles = () => {
+		const angleRange = Math.PI*4/3
+		const minAngle = -Math.PI*2/3
+		const minorGradAngles = []
+		for (let i = 0; i < this.minorGrads*this.majorGrads-this.minorGrads; i++) {
+			if (i%this.minorGrads===0) continue
+			minorGradAngles.push(
+				minAngle+(i*angleRange)/(this.minorGrads*this.majorGrads-this.minorGrads)
+			)
+		}
+		return minorGradAngles
 	}
 
 	getMajorGradValues = () => {
@@ -46,39 +64,58 @@ export default class Gauge extends Component {
 		const majorGradValues = []
 		for (let i = 0; i <= this.majorGrads; i++)
 			majorGradValues.push(
-				range[0]+(i*valueRange)/this.majorGrads.toFixed(0)
+				(range[0]+(i*valueRange)/(this.majorGrads-1)).toFixed(0)
 			)
 		return majorGradValues
 	}
 
+	getMinorGradValues = () => {
+		const {range} = this.props
+		const valueRange = range[1]-range[0]
+		const minorGradValues = []
+		for (let i = 0; i <= this.minorGrads*this.majorGrads-this.minorGrads; i++) {
+			if (i%this.minorGrads===0) continue
+			minorGradValues.push(
+				(range[0]+(i*valueRange)/(this.minorGrads*this.majorGrads-this.minorGrads)).toFixed(0)
+			)
+		}
+		return minorGradValues
+	}
+
 	// Construction Functions
-	buildMinorGrads = () => {
-		const {width} = this.props
-
-		const centerX = width/2
-		const centerY = width/2
-
+	buildMajorGrads = () => {
 		const majorGradAngles = this.getMajorGradAngles()
 		console.log(majorGradAngles)
-		const ctx = this.node.getContext('2d')
-		ctx.translate(this.node.width/2, this.node.width/2)
-		ctx.strokeStyle = this.minorGraduationColor
-		
+		this.ctx.strokeStyle = this.majorGraduationColor
 		majorGradAngles.forEach((angle) => {
 			const x1 = Math.round(Math.cos(Math.PI/2 - angle) * (this.innerRadius-this.gradMarginTop-this.majorGradLength))
 			const y1 = -Math.round(Math.sin(Math.PI/2 - angle) * (this.innerRadius-this.gradMarginTop-this.majorGradLength))
 			const x2 = Math.round(Math.cos(Math.PI/2 - angle) * (this.innerRadius-this.gradMarginTop))
 			const y2 = -Math.round(Math.sin(Math.PI/2 - angle) * (this.innerRadius-this.gradMarginTop))
 			console.log(`x1: ${x1}, y1: ${y1}, x2: ${x2}, y2: ${y2}`)
-			ctx.beginPath()
-			ctx.moveTo(x1, y1)
-			ctx.lineTo(x2, y2)
-			ctx.stroke()
+			this.ctx.beginPath()
+			this.ctx.moveTo(x1, y1)
+			this.ctx.lineTo(x2, y2)
+			this.ctx.stroke()
 		})
 	}
 
-	buildMajorGrads = () => {
-		return (undefined)
+	buildMinorGrads = () => {
+		const minorGradAngles = this.getMinorGradAngles()
+		console.log(minorGradAngles)
+		this.ctx.strokeStyle = this.minorGraduationColor
+		
+		minorGradAngles.forEach((angle) => {
+			const x1 = Math.round(Math.cos(Math.PI/2 - angle) * (this.innerRadius-this.gradMarginTop-this.minorGradLength))
+			const y1 = -Math.round(Math.sin(Math.PI/2 - angle) * (this.innerRadius-this.gradMarginTop-this.minorGradLength))
+			const x2 = Math.round(Math.cos(Math.PI/2 - angle) * (this.innerRadius-this.gradMarginTop))
+			const y2 = -Math.round(Math.sin(Math.PI/2 - angle) * (this.innerRadius-this.gradMarginTop))
+			console.log(`x1: ${x1}, y1: ${y1}, x2: ${x2}, y2: ${y2}`)
+			this.ctx.beginPath()
+			this.ctx.moveTo(x1, y1)
+			this.ctx.lineTo(x2, y2)
+			this.ctx.stroke()
+		})
 	}
 
 	componentDidUpdate = () => {
@@ -111,5 +148,5 @@ Gauge.defaultProps = {
 	range: [0, 1],
 	width: 300, 		// to be removed later
 	majorGrads: 5,
-	minorGrads: 10
+	minorGrads: 3
 }
