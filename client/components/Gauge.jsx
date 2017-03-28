@@ -5,7 +5,7 @@ export default class Gauge extends Component {
 	constructor (props) {
 		super(props)
 		const {width, minorGrads, majorGrads} = this.props
-		this.node = this.getDOMNode()
+		this.node = undefined
 
 		// ToDo: scale according to width (use % instead of x/300)
 		this.innerRadius = Math.round(width*130/300)
@@ -24,15 +24,19 @@ export default class Gauge extends Component {
 		this.needleTextSize = 8
 	}
 
+	componentDidMount() {
+		this.buildMinorGrads()
+	}
+
 	// Helper Functions
 	getMajorGradAngles = () => {
-		const angleRange = 240
-		const minAngle = -120
+		const angleRange = Math.PI*4/3
+		const minAngle = -Math.PI*2/3
 		const majorGradAngles = []
-		for (let i = 0; i <= this.majorGrads; i++)
+		for (let i = 0; i <= this.majorGrads; i++){
 			majorGradAngles.push(
 				minAngle+(i*angleRange)/this.majorGrads
-			)
+			)}
 		return majorGradAngles
 	}
 
@@ -49,7 +53,28 @@ export default class Gauge extends Component {
 
 	// Construction Functions
 	buildMinorGrads = () => {
-		return (undefined)
+		const {width} = this.props
+
+		const centerX = width/2
+		const centerY = width/2
+
+		const majorGradAngles = this.getMajorGradAngles()
+		console.log(majorGradAngles)
+		const ctx = this.node.getContext('2d')
+		ctx.translate(this.node.width/2, this.node.width/2)
+		ctx.strokeStyle = this.minorGraduationColor
+		
+		majorGradAngles.forEach((angle) => {
+			const x1 = Math.round(Math.cos(Math.PI/2 - angle) * (this.innerRadius-this.gradMarginTop-this.majorGradLength))
+			const y1 = -Math.round(Math.sin(Math.PI/2 - angle) * (this.innerRadius-this.gradMarginTop-this.majorGradLength))
+			const x2 = Math.round(Math.cos(Math.PI/2 - angle) * (this.innerRadius-this.gradMarginTop))
+			const y2 = -Math.round(Math.sin(Math.PI/2 - angle) * (this.innerRadius-this.gradMarginTop))
+			console.log(`x1: ${x1}, y1: ${y1}, x2: ${x2}, y2: ${y2}`)
+			ctx.beginPath()
+			ctx.moveTo(x1, y1)
+			ctx.lineTo(x2, y2)
+			ctx.stroke()
+		})
 	}
 
 	buildMajorGrads = () => {
@@ -68,7 +93,10 @@ export default class Gauge extends Component {
 	render () {
 
 		return (
-			<div>{this.props.range[0]}</div>
+			<div>
+				<div>{this.props.range[0]}</div>
+				<canvas width height={this.props.width} ref={(gauge) => this.node=gauge}></canvas>
+			</div>
 		)
 	}
 }
