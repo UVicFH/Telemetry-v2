@@ -33,7 +33,7 @@ setInterval(function() {
 				req.write(JSON.stringify(
 					[{
 						'dataId': 'speed',
-						'data': [sec]
+						'data': [sec*0.01]
 					}]
 				))
 				req.end()
