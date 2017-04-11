@@ -11,8 +11,6 @@ class Gauge extends Component {
 		this.ctxStatic = undefined
 		this.ctxActive = undefined
 
-		this.needle = undefined
-
 		// ToDo: scale according to width (use % instead of x/300)
 		this.innerRadius = Math.round(width*130/300)
 		this.outterRadius = Math.round(width*145/300)
@@ -20,11 +18,19 @@ class Gauge extends Component {
 		this.minorGrads = minorGrads
 		this.majorGradLength = Math.round(width*16/300)
 		this.minorGradLength = Math.round(width*10/300)
-		this.gradMarginTop = Math.round(width*2/30)
+		this.gradMarginTop = Math.round(width*8/30)
 		this.majorGradColor = 'B0B0B0'
 		this.minorGradColor = '#D0D0D0'
 		this.majorGradTextColor = '6C6C6C'
 		this.majorGradsFontSize = 10
+		this.indicatorWidth = 20
+		this.indicatorColorMap = {
+			'undefined': 'gray',
+			'safe': 'green',
+			'neutral': 'yellow',
+			'warning': 'orange',
+			'danger': 'red'
+		}
 		this.needleColor = '#416094'
 		this.needleWidth = 6
 		this.needleLength = this.innerRadius - this.majorGradLength - this.gradMarginTop
@@ -38,14 +44,11 @@ class Gauge extends Component {
 		this.ctxStatic.translate(this.canvasStatic.width/2, this.canvasStatic.width/2)
 		this.ctxActive.translate(this.canvasActive.width/2, this.canvasActive.width/2)
 
-		this.ctxStatic.beginPath()
 		this.drawMajorGrads(this.ctxStatic)
 		this.drawMinorGrads(this.ctxStatic)
-		this.ctxStatic.stroke()
+		this.drawIndicators(this.ctxStatic)
 
-		this.ctxActive.beginPath()
 		this.drawNeedle(this.ctxActive)
-		this.ctxActive.stroke()
 	}
 
 	componentDidReceiveProps = (nextProps) => {
@@ -62,11 +65,11 @@ class Gauge extends Component {
 	}
 
 	// Helper Functions
-	getAngle = (value, grads) => {
+	getAngle = (value, range) => {
 		const angleRange = Math.PI*4/3
-		const minAngle = -Math.PI*2/3
+		const minAngle = Math.PI*5/6
 
-		return minAngle + (value * angleRange) / (grads)
+		return minAngle + (value * angleRange) / (range) 
 	}
 
 	getMajorGradAngles = () => {
@@ -118,15 +121,16 @@ class Gauge extends Component {
 	drawMajorGrads = (ctx) => {
 		const majorGradAngles = this.getMajorGradAngles()
 		const majorGradValues = this.getMajorGradValues(2)
-		ctx.strokeStyle = this.majorGraduationColor
+		ctx.strokeStyle = this.majorGradColor
+		ctx.beginPath()
 
 		majorGradAngles.forEach((angle, index) => {
-			const x1 = Math.round(Math.cos(Math.PI/2 - angle) * (this.outterRadius-this.gradMarginTop-this.majorGradLength))
-			const y1 = -Math.round(Math.sin(Math.PI/2 - angle) * (this.outterRadius-this.gradMarginTop-this.majorGradLength))
-			const x2 = Math.round(Math.cos(Math.PI/2 - angle) * (this.outterRadius-this.gradMarginTop))
-			const y2 = -Math.round(Math.sin(Math.PI/2 - angle) * (this.outterRadius-this.gradMarginTop))
-			const tx = Math.round(Math.cos(Math.PI/2 - angle) * (this.outterRadius-this.gradMarginTop-this.majorGradLength-this.majorGradsFontSize*1.5))
-			const ty = -Math.round(Math.sin(Math.PI/2 - angle) * (this.outterRadius-this.gradMarginTop-this.majorGradLength-this.majorGradsFontSize*1.5))
+			const x1 = Math.round(Math.cos(angle) * (this.outterRadius-this.gradMarginTop-this.majorGradLength))
+			const y1 = Math.round(Math.sin(angle) * (this.outterRadius-this.gradMarginTop-this.majorGradLength))
+			const x2 = Math.round(Math.cos(angle) * (this.outterRadius-this.gradMarginTop))
+			const y2 = Math.round(Math.sin(angle) * (this.outterRadius-this.gradMarginTop))
+			const tx = Math.round(Math.cos(angle) * (this.outterRadius-this.gradMarginTop-this.majorGradLength-this.majorGradsFontSize*1.5))
+			const ty = Math.round(Math.sin(angle) * (this.outterRadius-this.gradMarginTop-this.majorGradLength-this.majorGradsFontSize*1.5))
 			console.log(`x1: ${x1}, y1: ${y1}, x2: ${x2}, y2: ${y2}`)
 			ctx.moveTo(x1, y1)
 			ctx.lineTo(x2, y2)
@@ -134,20 +138,54 @@ class Gauge extends Component {
 			ctx.font=`${this.majorGradsFontSize} Arial`
 			ctx.fillText(majorGradValues[index], tx, ty)
 		})
+		ctx.stroke()
 	}
 
 	drawMinorGrads = (ctx) => {
 		const minorGradAngles = this.getMinorGradAngles()
-		ctx.strokeStyle = this.minorGraduationColor
+		console.log(minorGradAngles)
+		ctx.strokeStyle = this.minorGradColor
+		ctx.beginPath()
 
 		minorGradAngles.forEach((angle) => {
-			const x1 = Math.round(Math.cos(Math.PI/2 - angle) * (this.outterRadius-this.gradMarginTop-this.minorGradLength))
-			const y1 = -Math.round(Math.sin(Math.PI/2 - angle) * (this.outterRadius-this.gradMarginTop-this.minorGradLength))
-			const x2 = Math.round(Math.cos(Math.PI/2 - angle) * (this.outterRadius-this.gradMarginTop))
-			const y2 = -Math.round(Math.sin(Math.PI/2 - angle) * (this.outterRadius-this.gradMarginTop))
+			const x1 = Math.round(Math.cos(angle) * (this.outterRadius-this.gradMarginTop-this.minorGradLength))
+			const y1 = Math.round(Math.sin(angle) * (this.outterRadius-this.gradMarginTop-this.minorGradLength))
+			const x2 = Math.round(Math.cos(angle) * (this.outterRadius-this.gradMarginTop))
+			const y2 = Math.round(Math.sin(angle) * (this.outterRadius-this.gradMarginTop))
 			console.log(`x1: ${x1}, y1: ${y1}, x2: ${x2}, y2: ${y2}`)
 			ctx.moveTo(x1, y1)
 			ctx.lineTo(x2, y2)
+		})
+		ctx.stroke()
+	}
+
+	drawIndicators = (ctx) => {
+		const {rangeIndicators, range} = this.props
+		const smallRadius = this.outterRadius-this.gradMarginTop
+		const largeRadius = this.outterRadius-this.gradMarginTop+this.indicatorWidth
+		Object.keys(this.props.rangeIndicators).forEach((indicator, index) => {
+			const angle1 = this.getAngle(rangeIndicators[indicator][0], range[1]-range[0])
+			const angle2 = this.getAngle(rangeIndicators[indicator][1], range[1]-range[0])
+			const x1 = Math.round(Math.cos(angle1) * smallRadius)
+			const y1 = Math.round(Math.sin(angle1) * smallRadius)
+			const x2 = Math.round(Math.cos(angle1) * largeRadius)
+			const y2 = Math.round(Math.sin(angle1) * largeRadius)
+			const x3 = Math.round(Math.cos(angle2) * largeRadius)
+			const y3 = Math.round(Math.sin(angle2) * largeRadius)
+			const x4 = Math.round(Math.cos(angle2) * smallRadius)
+			const y4 = Math.round(Math.sin(angle2) * smallRadius)
+			console.log(`x1: ${x1}, y1: ${y1}, x2: ${x2}, y2: ${y2}, x3: ${x3}, y3: ${y3}, x4: ${x4}, y4: ${y4}, angle1: ${angle1}, angle2: ${angle2}`)
+
+			ctx.fillStyle = this.indicatorColorMap[indicator]
+			ctx.beginPath()
+			ctx.moveTo(x1, y1)
+			ctx.lineTo(x2, y2)
+			ctx.arc(0, 0, largeRadius, angle1, angle2)
+			ctx.lineTo(x3, y3)
+			ctx.arc(0, 0, smallRadius, angle2, angle1, true)
+			ctx.moveTo(x1, y1)
+			ctx.closePath()
+			ctx.fill()
 		})
 	}
 
@@ -155,12 +193,13 @@ class Gauge extends Component {
 		const {range, value} = this.props
 		const needleAngle = this.getAngle(value, range[1]-range[0])
 
+		ctx.beginPath()
 		ctx.rotate(needleAngle)
 		ctx.fillStyle = this.needleColor
 		ctx.strokeStyle = 'rgba(0, 0, 0, 0)'
-		ctx.moveTo(-this.needleWidth/2, 0)
-		ctx.lineTo(this.needleWidth/2, 0)
-		ctx.lineTo(0, -this.needleLength)
+		ctx.moveTo(0, -this.needleWidth/2)
+		ctx.lineTo(0, this.needleWidth/2)
+		ctx.lineTo(this.needleLength, 0)
 		ctx.fill()
 		ctx.moveTo(0, 0)
 		ctx.arc(0, 0, this.needleWidth*0.8, 0, 2*Math.PI)
@@ -186,21 +225,35 @@ class Gauge extends Component {
 }
 
 Gauge.propTypes = {
+	// passed in
 	range: PropTypes.array,
-	size: PropTypes.shape({
-		width: PropTypes.number,
-		height: PropTypes.number
+	rangeIndicators: PropTypes.shape({
+		undefined: PropTypes.arrayOf(PropTypes.number),
+		safe: PropTypes.arrayOf(PropTypes.number),
+		neutral: PropTypes.arrayOf(PropTypes.number),
+		warning: PropTypes.arrayOf(PropTypes.number),
+		danger: PropTypes.arrayOf(PropTypes.number)
 	}),
-	width: PropTypes.number,
 	majorGrads: PropTypes.number,
 	minorGrads: PropTypes.number,
-	value: PropTypes.number
+	value: PropTypes.number,
+	// injected
+	size: PropTypes.shape({
+		width: PropTypes.number.isRequired,
+		height: PropTypes.number.isRequired
+	})
 }
 Gauge.defaultProps = {
 	range: [0, 1],
-	width: 300, 		// to be removed later
+	rangeIndicators: {
+		undefined: [0, 0.2],
+		safe: [0.2, 0.4],
+		neutral: [0.4, 0.6],
+		warning: [0.6, 0.8],
+		danger: [0.8, 1]
+	},
 	majorGrads: 5,
-	minorGrads: 3,
+	minorGrads: 4,
 	value: 0.5
 }
 
