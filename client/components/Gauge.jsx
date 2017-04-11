@@ -14,7 +14,7 @@ class Gauge extends Component {
 			warning: PropTypes.arrayOf(PropTypes.number),
 			danger: PropTypes.arrayOf(PropTypes.number)
 		}),
-		value: PropTypes.number,
+		data: PropTypes.arrayOf(PropTypes.number),
 		majorGrads: PropTypes.number,
 		minorGrads: PropTypes.number,
 		// injected
@@ -23,6 +23,7 @@ class Gauge extends Component {
 			height: PropTypes.number.isRequired
 		})
 	}
+
 	static defaultProps = {
 		range: [0, 1],
 		rangeIndicators: {
@@ -32,7 +33,7 @@ class Gauge extends Component {
 			warning: [0.6, 0.8],
 			danger: [0.8, 1]
 		},
-		value: 0.5,
+		data: [0.5],
 		majorGrads: 5,
 		minorGrads: 4,
 	}
@@ -85,8 +86,11 @@ class Gauge extends Component {
 		this.drawNeedle(this.ctxActive)
 	}
 
-	componentDidReceiveProps = (nextProps) => {
-
+	componentWillReceiveProps = (nextProps) => {
+		if (this.props.data[0] !== nextProps.data[0]) {
+			this.ctxActive.clearRect(-this.canvasActive.width/2, -this.canvasActive.height/2, 10000, 10000)
+			this.drawNeedle(this.ctxActive)
+		}
 	}
 
 	componentDidUpdate = () => {
@@ -165,7 +169,6 @@ class Gauge extends Component {
 			const y2 = Math.round(Math.sin(angle) * (this.outterRadius-this.gradMarginTop))
 			const tx = Math.round(Math.cos(angle) * (this.outterRadius-this.gradMarginTop-this.majorGradLength-this.majorGradsFontSize*1.5))
 			const ty = Math.round(Math.sin(angle) * (this.outterRadius-this.gradMarginTop-this.majorGradLength-this.majorGradsFontSize*1.5))
-			console.log(`x1: ${x1}, y1: ${y1}, x2: ${x2}, y2: ${y2}`)
 			ctx.moveTo(x1, y1)
 			ctx.lineTo(x2, y2)
 			ctx.textAlign = 'center'
@@ -173,11 +176,11 @@ class Gauge extends Component {
 			ctx.fillText(majorGradValues[index], tx, ty)
 		})
 		ctx.stroke()
+		ctx.closePath()
 	}
 
 	drawMinorGrads = (ctx) => {
 		const minorGradAngles = this.getMinorGradAngles()
-		console.log(minorGradAngles)
 		ctx.strokeStyle = this.minorGradColor
 		ctx.beginPath()
 
@@ -186,18 +189,18 @@ class Gauge extends Component {
 			const y1 = Math.round(Math.sin(angle) * (this.outterRadius-this.gradMarginTop-this.minorGradLength))
 			const x2 = Math.round(Math.cos(angle) * (this.outterRadius-this.gradMarginTop))
 			const y2 = Math.round(Math.sin(angle) * (this.outterRadius-this.gradMarginTop))
-			console.log(`x1: ${x1}, y1: ${y1}, x2: ${x2}, y2: ${y2}`)
 			ctx.moveTo(x1, y1)
 			ctx.lineTo(x2, y2)
 		})
 		ctx.stroke()
+		ctx.closePath()
 	}
 
 	drawIndicators = (ctx) => {
 		const {rangeIndicators, range} = this.props
 		const smallRadius = this.outterRadius-this.gradMarginTop
 		const largeRadius = this.outterRadius-this.gradMarginTop+this.indicatorWidth
-		Object.keys(this.props.rangeIndicators).forEach((indicator, index) => {
+		Object.keys(this.props.rangeIndicators).forEach((indicator) => {
 			const angle1 = this.getAngle(rangeIndicators[indicator][0], range[1]-range[0])
 			const angle2 = this.getAngle(rangeIndicators[indicator][1], range[1]-range[0])
 			const x1 = Math.round(Math.cos(angle1) * smallRadius)
@@ -208,40 +211,44 @@ class Gauge extends Component {
 			const y3 = Math.round(Math.sin(angle2) * largeRadius)
 			const x4 = Math.round(Math.cos(angle2) * smallRadius)
 			const y4 = Math.round(Math.sin(angle2) * smallRadius)
-			console.log(`x1: ${x1}, y1: ${y1}, x2: ${x2}, y2: ${y2}, x3: ${x3}, y3: ${y3}, x4: ${x4}, y4: ${y4}, angle1: ${angle1}, angle2: ${angle2}`)
 
 			ctx.fillStyle = this.indicatorColorMap[indicator]
 			ctx.beginPath()
 			ctx.moveTo(x1, y1)
 			ctx.lineTo(x2, y2)
 			ctx.arc(0, 0, largeRadius, angle1, angle2)
-			ctx.lineTo(x3, y3)
+			ctx.lineTo(x4, y4)
 			ctx.arc(0, 0, smallRadius, angle2, angle1, true)
 			ctx.moveTo(x1, y1)
-			ctx.closePath()
 			ctx.fill()
+			ctx.closePath()
 		})
 	}
 
 	drawNeedle = (ctx) => {
-		const {range, value} = this.props
-		const needleAngle = this.getAngle(value, range[1]-range[0])
+		const {range, data} = this.props
+		const needleAngle = this.getAngle(data[0], range[1]-range[0])
 
-		ctx.beginPath()
 		ctx.rotate(needleAngle)
+		ctx.beginPath()
 		ctx.fillStyle = this.needleColor
 		ctx.strokeStyle = 'rgba(0, 0, 0, 0)'
 		ctx.moveTo(0, -this.needleWidth/2)
 		ctx.lineTo(0, this.needleWidth/2)
 		ctx.lineTo(this.needleLength, 0)
+		ctx.closePath()
 		ctx.fill()
+
+		ctx.beginPath()
 		ctx.moveTo(0, 0)
 		ctx.arc(0, 0, this.needleWidth*0.8, 0, 2*Math.PI)
+		ctx.closePath()
 		ctx.fill()
 		ctx.rotate(-needleAngle)
+
 		ctx.font=`${this.needleFontSize}px Arial`
 		ctx.textAlign = 'center'
-		ctx.fillText(`${value}`, 0, this.needleFontSize*3)
+		ctx.fillText(`${data[0]}`, 0, this.needleFontSize*3)
 	}
 
 	render () {
