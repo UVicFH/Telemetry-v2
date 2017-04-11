@@ -1,10 +1,11 @@
 import React, {Component, PropTypes} from 'react'
+import sizeMe from 'react-sizeme'
 import 'plotly'
 
-export default class Gauge extends Component {
+class Gauge extends Component {
 	constructor (props) {
 		super(props)
-		const {width, minorGrads, majorGrads} = this.props
+		const {size: {width}, minorGrads, majorGrads} = this.props
 		this.canvasStatic = undefined
 		this.canvasActive = undefined
 		this.ctxStatic = undefined
@@ -19,16 +20,16 @@ export default class Gauge extends Component {
 		this.minorGrads = minorGrads
 		this.majorGradLength = Math.round(width*16/300)
 		this.minorGradLength = Math.round(width*10/300)
-		this.gradMarginTop = Math.round(width*7/30)
+		this.gradMarginTop = Math.round(width*2/30)
 		this.majorGradColor = 'B0B0B0'
 		this.minorGradColor = '#D0D0D0'
 		this.majorGradTextColor = '6C6C6C'
-		this.majorGradsTextSize = 10
+		this.majorGradsFontSize = 10
 		this.needleColor = '#416094'
-		this.needleWidth = 8
-		this.needleLength = this.innerRadius - 20
+		this.needleWidth = 6
+		this.needleLength = this.innerRadius - this.majorGradLength - this.gradMarginTop
 		this.needleTextOffset = Math.round(width*30/300)
-		this.needleTextSize = 8
+		this.needleFontSize = 12
 	}
 
 	componentDidMount() {
@@ -89,13 +90,13 @@ export default class Gauge extends Component {
 		return minorGradAngles
 	}
 
-	getMajorGradValues = () => {
+	getMajorGradValues = (precision) => {
 		const {range} = this.props
 		const valueRange = range[1]-range[0]
 		const majorGradValues = []
 		for (let i = 0; i <= this.majorGrads; i++)
 			majorGradValues.push(
-				(range[0]+(i*valueRange)/(this.majorGrads-1)).toFixed(0)
+				(range[0]+(i*valueRange*1.0)/(this.majorGrads-1)).toFixed(precision)
 			)
 		return majorGradValues
 	}
@@ -116,22 +117,29 @@ export default class Gauge extends Component {
 	// Construction Functions
 	drawMajorGrads = (ctx) => {
 		const majorGradAngles = this.getMajorGradAngles()
+		const majorGradValues = this.getMajorGradValues(2)
 		ctx.strokeStyle = this.majorGraduationColor
-		majorGradAngles.forEach((angle) => {
+
+		majorGradAngles.forEach((angle, index) => {
 			const x1 = Math.round(Math.cos(Math.PI/2 - angle) * (this.outterRadius-this.gradMarginTop-this.majorGradLength))
 			const y1 = -Math.round(Math.sin(Math.PI/2 - angle) * (this.outterRadius-this.gradMarginTop-this.majorGradLength))
 			const x2 = Math.round(Math.cos(Math.PI/2 - angle) * (this.outterRadius-this.gradMarginTop))
 			const y2 = -Math.round(Math.sin(Math.PI/2 - angle) * (this.outterRadius-this.gradMarginTop))
+			const tx = Math.round(Math.cos(Math.PI/2 - angle) * (this.outterRadius-this.gradMarginTop-this.majorGradLength-this.majorGradsFontSize*1.5))
+			const ty = -Math.round(Math.sin(Math.PI/2 - angle) * (this.outterRadius-this.gradMarginTop-this.majorGradLength-this.majorGradsFontSize*1.5))
 			console.log(`x1: ${x1}, y1: ${y1}, x2: ${x2}, y2: ${y2}`)
 			ctx.moveTo(x1, y1)
 			ctx.lineTo(x2, y2)
+			ctx.textAlign = 'center'
+			ctx.font=`${this.majorGradsFontSize} Arial`
+			ctx.fillText(majorGradValues[index], tx, ty)
 		})
 	}
 
 	drawMinorGrads = (ctx) => {
 		const minorGradAngles = this.getMinorGradAngles()
 		ctx.strokeStyle = this.minorGraduationColor
-		
+
 		minorGradAngles.forEach((angle) => {
 			const x1 = Math.round(Math.cos(Math.PI/2 - angle) * (this.outterRadius-this.gradMarginTop-this.minorGradLength))
 			const y1 = -Math.round(Math.sin(Math.PI/2 - angle) * (this.outterRadius-this.gradMarginTop-this.minorGradLength))
@@ -149,7 +157,7 @@ export default class Gauge extends Component {
 
 		ctx.rotate(needleAngle)
 		ctx.fillStyle = this.needleColor
-		ctx.strokeStyle = 'rgba(0,0,0,0)'
+		ctx.strokeStyle = 'rgba(0, 0, 0, 0)'
 		ctx.moveTo(-this.needleWidth/2, 0)
 		ctx.lineTo(this.needleWidth/2, 0)
 		ctx.lineTo(0, -this.needleLength)
@@ -158,15 +166,21 @@ export default class Gauge extends Component {
 		ctx.arc(0, 0, this.needleWidth*0.8, 0, 2*Math.PI)
 		ctx.fill()
 		ctx.rotate(-needleAngle)
+		ctx.font=`${this.needleFontSize}px Arial`
+		ctx.textAlign = 'center'
+		ctx.fillText(`${value}`, 0, 20)
 	}
 
 	render () {
-
+		const divStyle = {
+			width: this.props.size.width,
+			height: this.props.size.width
+		}
 		return (
-			<div>
+			<div style={divStyle}>
 				<div>{this.props.range[0]}</div>
-				<canvas width height={this.props.width} ref={(ref) => this.canvasStatic=ref}></canvas>
-				<canvas width height={this.props.width} ref={(ref) => this.canvasActive=ref}></canvas>
+				<canvas {...divStyle} ref={(ref) => this.canvasStatic=ref}></canvas>
+				<canvas {...divStyle} ref={(ref) => this.canvasActive=ref}></canvas>
 			</div>
 		)
 	}
@@ -174,6 +188,10 @@ export default class Gauge extends Component {
 
 Gauge.propTypes = {
 	range: PropTypes.array,
+	size: PropTypes.shape({
+		width: PropTypes.number,
+		height: PropTypes.number
+	}),
 	width: PropTypes.number,
 	majorGrads: PropTypes.number,
 	minorGrads: PropTypes.number,
@@ -186,3 +204,5 @@ Gauge.defaultProps = {
 	minorGrads: 3,
 	value: 0.5
 }
+
+export default sizeMe({ monitorHeight: true, monitorWidth: true })(Gauge)
