@@ -101,14 +101,14 @@ class Gauge extends Component {
 		return majorGradValues
 	}
 
-	getMinorGradValues = () => {
+	getMinorGradValues = (precision) => {
 		const {range} = this.props
 		const valueRange = range[1]-range[0]
 		const minorGradValues = []
 		for (let i = 0; i <= this.minorGrads*this.majorGrads-this.minorGrads; i++) {
 			if (i%this.minorGrads===0) continue
 			minorGradValues.push(
-				(range[0]+(i*valueRange)/(this.minorGrads*this.majorGrads-this.minorGrads)).toFixed(0)
+				(range[0]+(i*valueRange)/(this.minorGrads*this.majorGrads-this.minorGrads)).toFixed(precision)
 			)
 		}
 		return minorGradValues
@@ -168,7 +168,7 @@ class Gauge extends Component {
 		ctx.rotate(-needleAngle)
 		ctx.font=`${this.needleFontSize}px Arial`
 		ctx.textAlign = 'center'
-		ctx.fillText(`${value}`, 0, 20)
+		ctx.fillText(`${value}`, 0, this.needleFontSize*3)
 	}
 
 	render () {
@@ -178,7 +178,6 @@ class Gauge extends Component {
 		}
 		return (
 			<div style={divStyle}>
-				<div>{this.props.range[0]}</div>
 				<canvas {...divStyle} ref={(ref) => this.canvasStatic=ref}></canvas>
 				<canvas {...divStyle} ref={(ref) => this.canvasActive=ref}></canvas>
 			</div>

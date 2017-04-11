@@ -16,7 +16,7 @@ export default class Panel extends Component {
 				return(e.dataId === d.dataId)
 			})
 			elements.push(
-				<div className={`col-md-${e.width}`} key={e.header}>
+				<div className={`col-md-${e.width} well`} key={e.header}>
 					{/* FixMe: Determine what element props to pass through*/}
 					<Visualization unit={e.unit} data={visualizationData ? visualizationData.data : undefined}/>
 				</div>
