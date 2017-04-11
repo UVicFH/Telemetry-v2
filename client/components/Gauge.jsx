@@ -7,15 +7,48 @@ class Gauge extends Component {
 	static propTypes = {
 		// passed in
 		range: PropTypes.array,
-		rangeIndicators: PropTypes.shape({
-			undefined: PropTypes.arrayOf(PropTypes.number),
-			safe: PropTypes.arrayOf(PropTypes.number),
-			neutral: PropTypes.arrayOf(PropTypes.number),
-			warning: PropTypes.arrayOf(PropTypes.number),
-			danger: PropTypes.arrayOf(PropTypes.number)
-		}),
 		data: PropTypes.arrayOf(PropTypes.number),
-		displayProperties: PropTypes.object,
+		displayProperties: PropTypes.shape({
+			coefficients: PropTypes.shape({
+				innerRadius: PropTypes.number,
+				outterRadius: PropTypes.number,
+				majorGradLength: PropTypes.number,
+				minorGradLength: PropTypes.number,
+				indicatorWidth: PropTypes.number,
+				needleWidth: PropTypes.number,
+				needleLength: PropTypes.number,
+				needleTextOffset: PropTypes.number
+			}),
+			colors: PropTypes.shape({
+				majorGrad: PropTypes.string,
+				minorGrad: PropTypes.string,
+				majorGradText: PropTypes.string,
+				needle: PropTypes.string,
+				needleText: PropTypes.string
+			}),
+			fontSizes: PropTypes.shape({
+				majorGradText: PropTypes.number,
+				needleText: PropTypes.number
+			}),
+			rangeIndicators: PropTypes.shape({
+				ranges: PropTypes.shape({
+					undefined: PropTypes.arrayOf(PropTypes.number),
+					safe: PropTypes.arrayOf(PropTypes.number),
+					neutral: PropTypes.arrayOf(PropTypes.number),
+					warning: PropTypes.arrayOf(PropTypes.number),
+					danger: PropTypes.arrayOf(PropTypes.number)
+				}),
+				colorMap: PropTypes.shape({
+					'undefined': PropTypes.string,
+					'safe': PropTypes.string,
+					'neutral': PropTypes.string,
+					'warning': PropTypes.string,
+					'danger': PropTypes.string
+				})
+			}),
+			majorGrads: PropTypes.number,
+			minorGrads: PropTypes.number
+		}),
 		majorGrads: PropTypes.number,
 		minorGrads: PropTypes.number,
 		// injected
@@ -27,13 +60,6 @@ class Gauge extends Component {
 
 	static defaultProps = {
 		range: [0, 1],
-		rangeIndicators: {
-			undefined: [0, 0.2],
-			safe: [0.2, 0.4],
-			neutral: [0.4, 0.6],
-			warning: [0.6, 0.8],
-			danger: [0.8, 1]
-		},
 		data: [0.5],
 		displayProperties: {
 			coefficients: {
@@ -44,7 +70,7 @@ class Gauge extends Component {
 				indicatorWidth: 0.05,
 				needleWidth: 0.04,
 				needleLength: 0.35,
-				needleTextOffset: 0.1
+				needleTextOffset: 0.15
 			},
 			colors: {
 				majorGrad: '#B0B0B0',
@@ -57,12 +83,21 @@ class Gauge extends Component {
 				majorGradText: 10,
 				needleText: 12
 			},
-			indicatorColorMap: {
-				'undefined': 'gray',
-				'safe': 'green',
-				'neutral': 'yellow',
-				'warning': 'orange',
-				'danger': 'red'
+			rangeIndicators: {
+				ranges: {
+					undefined: [0, 0.2],
+					safe: [0.2, 0.4],
+					neutral: [0.4, 0.6],
+					warning: [0.6, 0.8],
+					danger: [0.8, 1]
+				},
+				colorMap: {
+					'undefined': 'gray',
+					'safe': 'green',
+					'neutral': 'yellow',
+					'warning': 'orange',
+					'danger': 'red'
+				}
 			},
 			majorGrads: 5,
 			minorGrads: 4
@@ -71,7 +106,7 @@ class Gauge extends Component {
 
 	constructor (props) {
 		super(props)
-		const {size: {width}, displayProperties: {coefficients, minorGrads, majorGrads, colors, fontSizes, indicatorColorMap}} = this.props
+		const {size: {width}, displayProperties: {coefficients, minorGrads, majorGrads, colors, fontSizes, rangeIndicators}} = this.props
 		this.canvasStatic = undefined
 		this.canvasActive = undefined
 		this.ctxStatic = undefined
@@ -110,7 +145,8 @@ class Gauge extends Component {
 			},
 			indicator: {
 				width: Math.round(width*coefficients.indicatorWidth),
-				colorMap: indicatorColorMap
+				ranges: rangeIndicators.ranges,
+				colorMap: rangeIndicators.colorMap
 			}
 		}
 		this.majorGrads = majorGrads
@@ -302,13 +338,14 @@ class Gauge extends Component {
 	}
 
 	drawIndicators = (ctx) => {
-		const {rangeIndicators, range} = this.props
+		const {range} = this.props
+		const indicatorRanges = this.display.indicator.ranges
 		const smallRadius = this.display.radii.outter-this.display.indicator.width
 		const largeRadius = this.display.radii.outter
 
-		Object.keys(this.props.rangeIndicators).forEach((indicator) => {
-			const angle1 = this.getAngle(rangeIndicators[indicator][0], range[1]-range[0])
-			const angle2 = this.getAngle(rangeIndicators[indicator][1], range[1]-range[0])
+		Object.keys(indicatorRanges).forEach((indicator) => {
+			const angle1 = this.getAngle(indicatorRanges[indicator][0], range[1]-range[0])
+			const angle2 = this.getAngle(indicatorRanges[indicator][1], range[1]-range[0])
 			const x1 = Math.round(Math.cos(angle1) * smallRadius)
 			const y1 = Math.round(Math.sin(angle1) * smallRadius)
 			const x2 = Math.round(Math.cos(angle1) * largeRadius)
