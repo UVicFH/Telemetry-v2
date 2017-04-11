@@ -3,6 +3,40 @@ import sizeMe from 'react-sizeme'
 import 'plotly'
 
 class Gauge extends Component {
+
+	static propTypes = {
+		// passed in
+		range: PropTypes.array,
+		rangeIndicators: PropTypes.shape({
+			undefined: PropTypes.arrayOf(PropTypes.number),
+			safe: PropTypes.arrayOf(PropTypes.number),
+			neutral: PropTypes.arrayOf(PropTypes.number),
+			warning: PropTypes.arrayOf(PropTypes.number),
+			danger: PropTypes.arrayOf(PropTypes.number)
+		}),
+		value: PropTypes.number,
+		majorGrads: PropTypes.number,
+		minorGrads: PropTypes.number,
+		// injected
+		size: PropTypes.shape({
+			width: PropTypes.number.isRequired,
+			height: PropTypes.number.isRequired
+		})
+	}
+	static defaultProps = {
+		range: [0, 1],
+		rangeIndicators: {
+			undefined: [0, 0.2],
+			safe: [0.2, 0.4],
+			neutral: [0.4, 0.6],
+			warning: [0.6, 0.8],
+			danger: [0.8, 1]
+		},
+		value: 0.5,
+		majorGrads: 5,
+		minorGrads: 4,
+	}
+
 	constructor (props) {
 		super(props)
 		const {size: {width}, minorGrads, majorGrads} = this.props
@@ -18,7 +52,7 @@ class Gauge extends Component {
 		this.minorGrads = minorGrads
 		this.majorGradLength = Math.round(width*16/300)
 		this.minorGradLength = Math.round(width*10/300)
-		this.gradMarginTop = Math.round(width*8/30)
+		this.gradMarginTop = Math.round(width*3/30)
 		this.majorGradColor = 'B0B0B0'
 		this.minorGradColor = '#D0D0D0'
 		this.majorGradTextColor = '6C6C6C'
@@ -52,7 +86,7 @@ class Gauge extends Component {
 	}
 
 	componentDidReceiveProps = (nextProps) => {
-		
+
 	}
 
 	componentDidUpdate = () => {
@@ -222,39 +256,6 @@ class Gauge extends Component {
 			</div>
 		)
 	}
-}
-
-Gauge.propTypes = {
-	// passed in
-	range: PropTypes.array,
-	rangeIndicators: PropTypes.shape({
-		undefined: PropTypes.arrayOf(PropTypes.number),
-		safe: PropTypes.arrayOf(PropTypes.number),
-		neutral: PropTypes.arrayOf(PropTypes.number),
-		warning: PropTypes.arrayOf(PropTypes.number),
-		danger: PropTypes.arrayOf(PropTypes.number)
-	}),
-	majorGrads: PropTypes.number,
-	minorGrads: PropTypes.number,
-	value: PropTypes.number,
-	// injected
-	size: PropTypes.shape({
-		width: PropTypes.number.isRequired,
-		height: PropTypes.number.isRequired
-	})
-}
-Gauge.defaultProps = {
-	range: [0, 1],
-	rangeIndicators: {
-		undefined: [0, 0.2],
-		safe: [0.2, 0.4],
-		neutral: [0.4, 0.6],
-		warning: [0.6, 0.8],
-		danger: [0.8, 1]
-	},
-	majorGrads: 5,
-	minorGrads: 4,
-	value: 0.5
 }
 
 export default sizeMe({ monitorHeight: true, monitorWidth: true })(Gauge)
